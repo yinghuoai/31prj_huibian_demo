@@ -1,0 +1,288 @@
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Page     1-1
+
+
+				assume cs:code  
+				 
+				 
+ 0000				code segment 
+				 
+					 
+					  
+					 
+					 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	fun ,fu
+				n0 =7 
+					 
+					 
+					 
+ 0000				begin: 
+				 
+				 
+ 0000  EB 08			    jmp  short chse 
+ 0002  0226 0241 025F 0281	a	dw offset fun0-offset begin+200h,offset
+				 fun1-offset begin+200h,offset fun2-offset begi
+				n+200h,offset fun3-offset begin+200h    ;;;;
+					 
+					;dw fun0,fun1,fun2,fun3  
+					 
+ 000A					chse: 
+					;;;;;;;;;;;;;;;;0:215h 
+ 000A  52				push dx 
+ 000B  53				push bx 
+ 000C  80 FC 03				cmp ah,3 
+ 000F  77 10				ja chseret 
+ 0011  8A DC				mov bl,ah  
+ 0013  B7 00				mov bh,0 
+ 0015  03 DB				add bx,bx  
+					 
+					 
+				 
+ 0017  B8 0000				mov ax,0  
+ 001A  8E C0				mov es,ax  
+				 
+					 
+ 001C  2E: FF 97 0202 R			call word ptr a[bx+200h];此处显示"c
+				s:"？？？;;;0:222:原语句：call [bx+0036]
+				 
+ 0021					chseret: 
+ 0021  5B				pop bx  
+ 0022  5A				pop dx 
+					 
+						 
+ 0023  E9 00B6 R			jmp ok 
+				 
+					 
+				 
+					 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Page     1-2
+
+
+					 
+ 0026				fun0:				;;;;;;;;;;0:228
+				 
+ 0026  53					push bx 
+ 0027  51					push cx  
+ 0028  06					push es  
+ 0029  BB B800					mov bx,0b800h 
+ 002C  8E C3					mov es,bx  
+ 002E  BB 0000					mov bx,0  
+ 0031  B9 07D0					mov cx,2000 
+ 0034					s0: 
+ 0034  26: C6 07 20				mov byte ptr es:[bx],' ' 
+ 0038  83 C3 02					add bx,2  
+ 003B  E2 F7					loop s0  
+ 003D  07					pop es  
+ 003E  59					pop cx  
+ 003F  5B					pop bx  
+ 0040  C3					ret  
+						 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;	 
+						 
+ 0041				fun1: 
+				 
+ 0041  53					push bx  
+ 0042  51					push cx  
+ 0043  06					push es  
+						 
+ 0044  BB B800					mov bx,0b800h 
+ 0047  8E C3					mov es,bx  
+ 0049  BB 0001					mov bx,1 
+ 004C  B9 07D0					mov cx,2000 
+ 004F					s1: 
+ 004F  26: 80 27 F8				and byte ptr es:[bx],11111000b 
+ 0053  26: 08 07				or es:[bx],al  
+ 0056  83 C3 02					add bx,2  
+ 0059  E2 F4					loop s1  
+						 
+ 005B  07					pop es  
+ 005C  59					pop cx  
+ 005D  5B					pop bx  
+ 005E  C3					ret  
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;; 
+						 
+ 005F				fun2: 
+ 005F  53					push bx  
+ 0060  51					push cx  
+ 0061  06					push es  
+						 
+						 
+ 0062  B1 04					mov cl,4  
+ 0064  D2 E0					shl al,cl  
+ 0066  BB B800					mov bx,0b800h 
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Page     1-3
+
+
+ 0069  8E C3					mov es,bx  
+ 006B  BB 0001					mov bx,1  
+ 006E  B9 07D0					mov cx,2000 
+ 0071					s2: 
+ 0071  26: 80 27 8F				and byte ptr es:[bx],10001111b 
+ 0075  26: 08 07				or es:[bx],al  
+ 0078  83 C3 02					add bx,2  
+ 007B  E2 F4					loop s2  
+						 
+ 007D  07					pop es  
+ 007E  59					pop cx  
+ 007F  5B					pop bx  
+ 0080  C3					ret  
+						 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+					 
+ 0081				fun3: 
+ 0081  51					push cx  
+ 0082  56					push si 
+ 0083  57					push di  
+ 0084  06					push es  
+ 0085  1E					push ds  
+						 
+						 
+ 0086  BE B800					mov si,0b800h 
+ 0089  8E C6					mov es,si  
+ 008B  8E DE					mov ds,si  
+ 008D  BE 00A0					mov si,160 
+ 0090  BF 0000					mov di,0  
+ 0093  FC					cld  
+ 0094  B9 0018					mov cx,24 
+ 0097					s3: 
+ 0097  51					push cx  
+ 0098  B9 00A0					mov cx,160 
+ 009B  F3/ A4					rep movsb 
+						 
+ 009D  59					pop cx  
+ 009E  E2 F7					loop s3 
+						 
+ 00A0  B9 0050					mov cx,80 
+ 00A3  BE 0000					mov si,0  
+ 00A6					clear: 
+ 00A6  C6 84 0F00 20				mov byte ptr ds:[160*24+si],' '
+				 
+ 00AB  83 C6 02					add si,2  
+ 00AE  E2 F6					loop clear  
+						 
+						 
+ 00B0  1F					pop ds  
+ 00B1  07					pop es  
+ 00B2  5F					pop di  
+ 00B3  5E					pop si  
+ 00B4  59					pop cx  
+ 00B5  C3					ret  
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Page     1-4
+
+
+						 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;	 
+						 
+ 00B6					ok: 
+ 00B6  CF				iret 
+						 
+ 00B7				beginend: 
+ 00B7  90				nop 
+							 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+				 
+ 00B8				start: 
+ 00B8  8C C8				mov ax,cs 
+ 00BA  8E D8				mov ds,ax  
+ 00BC  BE 0000 R			mov si,offset begin 
+ 00BF  B8 0000				mov ax,0 
+ 00C2  8E C0				mov es,ax  
+ 00C4  BF 0200				mov di,200h 
+ 00C7  B9 00B7				mov cx,offset beginend-offset begin  
+ 00CA  FC				cld 
+ 00CB  F3/ A4				rep movsb 
+					 
+					 
+ 00CD  B8 0003				mov ax,03 
+ 00D0  8E C0				mov es,ax  
+ 00D2  26: C7 06 01F0 0200		mov word ptr es:[7ch*4],200h 
+ 00D9  26: C7 06 01F2 0000		mov word ptr es:[7ch*4+2],0 
+					 
+					 
+					 
+ 00E0  B8 4C00				mov ax,4c00h 
+ 00E3  CD 21				int 21h 
+							 
+						 
+						 
+						 
+						 
+					 
+				 
+				 
+				 
+				 
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Page     1-5
+
+
+				 
+				 
+				 
+ 00E5				code ends  
+				end start  
+Microsoft (R) Macro Assembler Version 5.00                  4/8/17 14:33:18
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	00E5	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+A  . . . . . . . . . . . . . . .  	L WORD	0002	CODE
+
+BEGIN  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+BEGINEND . . . . . . . . . . . .  	L NEAR	00B7	CODE
+
+CHSE . . . . . . . . . . . . . .  	L NEAR	000A	CODE
+CHSERET  . . . . . . . . . . . .  	L NEAR	0021	CODE
+CLEAR  . . . . . . . . . . . . .  	L NEAR	00A6	CODE
+
+FUN0 . . . . . . . . . . . . . .  	L NEAR	0026	CODE
+FUN1 . . . . . . . . . . . . . .  	L NEAR	0041	CODE
+FUN2 . . . . . . . . . . . . . .  	L NEAR	005F	CODE
+FUN3 . . . . . . . . . . . . . .  	L NEAR	0081	CODE
+
+OK . . . . . . . . . . . . . . .  	L NEAR	00B6	CODE
+
+S0 . . . . . . . . . . . . . . .  	L NEAR	0034	CODE
+S1 . . . . . . . . . . . . . . .  	L NEAR	004F	CODE
+S2 . . . . . . . . . . . . . . .  	L NEAR	0071	CODE
+S3 . . . . . . . . . . . . . . .  	L NEAR	0097	CODE
+START  . . . . . . . . . . . . .  	L NEAR	00B8	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  165		
+
+
+    210 Source  Lines
+    210 Total   Lines
+     19 Symbols
+
+  50962 + 465582 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,149 @@
+Microsoft (R) Macro Assembler Version 5.00                  4/13/17 15:02:29
+                                                             Page     1-1
+
+
+				assume cs:code  
+				 
+				 
+				 
+ 0000				code segment 
+				 
+ 0000				start: 
+				 
+				 
+					 
+				 
+ 0000  E8 0008 R			call jiemian 
+					 
+					 
+ 0003  B8 4C00				mov ax,4c00h 
+ 0006  CD 21				int 21h  
+					 
+					 
+					 
+				 
+ 0008				jiemian: 
+				 
+ 0008  31 3E 20 72 65 73 65		first db '1> reset pc     ' 
+       74 20 70 63 20 20 20	
+       20 20			
+ 0018  32 3E 20 73 74 61 72	    two   db '2> start system ' 
+       74 20 73 79 73 74 65	
+       6D 20			
+ 0028  33 3E 20 63 6C 6F 63	    three db '3> clock        ' 
+       6B 20 20 20 20 20 20	
+       20 20			
+ 0038  34 3E 20 73 65 74 20	    four  db '4> set clock    ' 
+       63 6C 6F 63 6B 20 20	
+       20 20			
+				 
+				 
+ 0048  53				push bx  
+ 0049  06				push es  
+ 004A  56				push si  
+ 004B  51				push cx  
+ 004C  50				push ax 
+ 004D  57				push di 
+					 
+					;mov si,0 
+ 004E  BB B800				mov bx,0b800h 
+ 0051  8E C3				mov es,bx  
+ 0053  BF 07D0				mov di,160*12+40*2 
+				 
+ 0056  BE 0000				mov si,0 
+					 
+ 0059  B9 0010				mov cx,16  
+ 005C				show: 
+					 
+					 
+Microsoft (R) Macro Assembler Version 5.00                  4/13/17 15:02:29
+                                                             Page     1-2
+
+
+ 005C  2E: 8A 84 0008 R			mov al,first[si] 
+ 0061  B4 00				mov ah,0  
+ 0063  26: 88 05			mov byte ptr es:[di],al 
+ 0066  26: C6 45 01 02			mov byte ptr es:[di+1],02h 
+					 
+ 006B  2E: 8A 84 0018 R			mov al,two[si] 
+ 0070  B4 00				mov ah,0  
+ 0072  26: 88 85 00A0			mov byte ptr es:[di+160],al 
+ 0077  26: C6 85 00A1 02		mov byte ptr es:[di+160+1],02h 
+					 
+ 007D  2E: 8A 84 0028 R		    mov al,three[si] 
+ 0082  B4 00				mov ah,0  
+ 0084  26: 88 85 0140			mov byte ptr es:[di+160*2],al 
+ 0089  26: C6 85 0141 02		mov byte ptr es:[di+160*2+1],02h 
+					 
+ 008F  2E: 8A 84 0038 R			mov al,four[si] 
+ 0094  B4 00				mov ah,0 
+ 0096  26: 88 85 01E0			mov byte ptr es:[di+160*3],al 
+ 009B  26: C6 85 01E1 02		mov byte ptr es:[di+160*3+1],02h 
+					 
+ 00A1  46				inc si  
+ 00A2  83 C7 02				add di,2  
+					 
+ 00A5  E2 B5				loop show  
+					 
+					 
+				 
+				 
+				 
+					 
+ 00A7  5F				pop di  
+ 00A8  58				pop ax  
+ 00A9  59				pop cx  
+ 00AA  5E				pop si  
+ 00AB  07				pop es  
+ 00AC  5B				pop bx  
+					 
+					 
+					 
+					 
+					 
+ 00AD  C3				ret  
+				 
+				 
+				 
+				 
+				 
+				 
+				 
+ 00AE				code ends  
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  4/13/17 15:02:29
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	00AE	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+FIRST  . . . . . . . . . . . . .  	L BYTE	0008	CODE
+FOUR . . . . . . . . . . . . . .  	L BYTE	0038	CODE
+
+JIEMIAN  . . . . . . . . . . . .  	L NEAR	0008	CODE
+
+SHOW . . . . . . . . . . . . . .  	L NEAR	005C	CODE
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+THREE  . . . . . . . . . . . . .  	L BYTE	0028	CODE
+TWO  . . . . . . . . . . . . . .  	L BYTE	0018	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  son		
+
+
+     97 Source  Lines
+     97 Total   Lines
+     10 Symbols
+
+  50886 + 465658 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

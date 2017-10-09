@@ -1,0 +1,188 @@
+Microsoft (R) Macro Assembler Version 5.00                  4/6/17 17:14:10
+                                                             Page     1-1
+
+
+				assume cs:code  
+				 
+ 0000				stack segment 
+ 0000  0080[				db 128 dup(0) 
+	   00			
+			 ]	
+				
+				 
+ 0080				stack ends 
+				 
+				 
+				 
+ 0000				code segment 
+				 
+ 0000				start: 
+ 0000  B8 ---- R			mov ax,stack  
+ 0003  8E D0				mov ss,ax  
+ 0005  BC 0080				mov sp,128  
+					 
+					 
+				 
+				 
+					 
+					;;;;;;;;;;;;;;;;;;;;save the old cs,ip 
+					 
+ 0008  B8 0000				mov ax,0 
+ 000B  8E D8				mov ds,ax  
+ 000D  FF 36 0024			push ds:[9*4] 
+ 0011  8F 06 00C8			pop ds:[200] 
+ 0015  FF 36 0026			push ds:[9*4+2] 
+ 0019  8F 06 00CA			pop ds:[202] 
+					 
+					 
+ 001D  0E				push cs 
+ 001E  1F				pop ds  
+					 
+ 001F  B8 0000				mov ax,0  
+ 0022  8E C0				mov es,ax  
+					 
+					;;;;;;;;;;;;;;copy the code to 0:204 å¤
+				„ 
+ 0024  BE 0043 R			mov si,offset int9begin 
+ 0027  BF 00CC				mov di,204 
+ 002A  B9 002A				mov cx,offset int9end-int9begin 
+ 002D  FC				cld  
+ 002E  F3/ A4				rep movsb  
+					 
+					 
+					;;;;;;;;;;;;;;;;;;;;;new int9 
+ 0030  FA				cli 
+ 0031  C7 06 0024 00CC			mov word ptr ds:[9*4],204 
+ 0037  C7 06 0026 0000			mov word ptr ds:[9*4+2],0 
+					 
+ 003D  FB				sti 
+Microsoft (R) Macro Assembler Version 5.00                  4/6/17 17:14:10
+                                                             Page     1-2
+
+
+					 
+					 
+ 003E  B8 4C00				mov ax,4c00h 
+ 0041  CD 21				int 21h 
+					 
+					 
+					;;;;;what is int9 
+ 0043					int9begin: 
+					 
+ 0043  50				push ax  
+ 0044  06				push es  
+ 0045  56				push si  
+ 0046  57				push di  
+ 0047  51				push cx  
+					 
+					 
+					 
+					;;press a to AAAAAA 
+ 0048  E4 60				in al,60h 
+					 
+					 
+ 004A  9C				pushf  
+ 004B  FF 1E 00C8			call dword ptr ds:[200] 
+					 
+					 
+					 
+ 004F  3C 9E				cmp al,9eh 
+ 0051  75 14				jne jieshu 
+					 
+					 
+ 0053				show: 
+					 
+ 0053  B8 B800				mov ax,0b800h 
+ 0056  8E C0				mov es,ax  
+ 0058  BE 0000				mov si,0  
+ 005B  B9 07D0				mov cx,2000 
+					 
+ 005E					s: 
+					 
+ 005E  26: C6 04 40			mov byte ptr es:[si],40h 
+					 
+ 0062  83 C6 02				add si,2  
+					 
+					 
+ 0065  E2 F7				loop s 
+					 
+					 
+					 
+					 
+				 
+					 
+					 
+					 
+					 
+Microsoft (R) Macro Assembler Version 5.00                  4/6/17 17:14:10
+                                                             Page     1-3
+
+
+					 
+ 0067					jieshu: 
+					 
+					 
+					 
+ 0067  59				pop cx  
+ 0068  5F				pop di  
+ 0069  5E				pop si  
+ 006A  07				pop es  
+ 006B  58				pop ax  
+ 006C  CF				iret 
+					 
+					 
+ 006D					int9end: 
+ 006D  90				nop  
+				 
+				 
+				 
+				 
+				 
+					 
+					 
+					 
+					 
+				 
+				 
+				 
+				 
+				 
+				 
+				 
+ 006E				code ends 
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  4/6/17 17:14:10
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	006E	PARA	NONE	
+STACK  . . . . . . . . . . . . .  	0080	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+INT9BEGIN  . . . . . . . . . . .  	L NEAR	0043	CODE
+INT9END  . . . . . . . . . . . .  	L NEAR	006D	CODE
+
+JIESHU . . . . . . . . . . . . .  	L NEAR	0067	CODE
+
+S  . . . . . . . . . . . . . . .  	L NEAR	005E	CODE
+SHOW . . . . . . . . . . . . . .  	L NEAR	0053	CODE
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  151		
+
+
+    137 Source  Lines
+    137 Total   Lines
+     10 Symbols
+
+  50960 + 465584 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,1170 @@
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-1
+
+
+				assume cs:xieru 
+				 
+ 0000				xieru segment		;写入软盘 
+				 
+ 0000				start: 
+				 
+				    ;复制读入程序到软盘0面0道1扇区
+				  
+				 
+ 0000  B8 ---- R		    mov ax,duru  
+ 0003  8E C0			    mov es,ax 
+ 0005  BB 0000			    mov bx,0  ;es:bx指向要写的单元 
+					 
+ 0008  BA 0000			    mov dx,0 
+ 000B  B9 0001			    mov cx,1 
+ 000E  B0 01			    mov al,1 
+ 0010  B4 03			    mov ah,3 
+ 0012  CD 13			    int 13h 
+				 
+				    
+				 
+				    ;复制所有程序到软盘0面0道2~11扇
+				区 
+				 
+ 0014  B8 ---- R		    mov ax,code 
+ 0017  8E C0			    mov es,ax        
+ 0019  BB 0000				mov bx,0 
+									;es:bx�
+				��向要写的单元 
+ 001C  BA 0000			    mov dx,0 
+ 001F  B9 0002			    mov cx,2         
+ 0022  B0 0A			    mov al,10  
+ 0024  B4 03			    mov ah,3 
+ 0026  CD 13			    int 13h 
+				 
+ 0028  B8 4C00			    mov ax,4c00h 
+ 002B  CD 21			    int 21h 
+				 
+ 002D				xieru ends 
+				 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;; 
+				 
+				  
+ 0000				duru segment 
+				assume cs:duru  
+				 
+				    ;读程序到3000:0 
+					 
+					 
+ 0000  B8 3000			    mov ax,3000h 
+ 0003  8E C0			    mov es,ax 
+ 0005  BB 0000			    mov bx,0 
+ 0008  50			    push ax 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-2
+
+
+ 0009  53			    push bx 
+						 
+ 000A  BA 0000			    mov dx,0 
+ 000D  B9 0002			    mov cx,2 
+ 0010  B0 02			    mov al,2  
+ 0012  B4 02			    mov ah,2 
+ 0014  CD 13			    int 13h 
+				 
+ 0016  CB			    retf		;将cs:ip指向任务�
+				�序的首地址3000:0 
+				 
+ 0017				duru ends 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+				 
+				 
+				 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+				  
+ 0000				code segment   
+				 
+				assume cs:code  
+ 0000				lizhiyu:  
+ 0000  EB 09 90					jmp  kaishi   
+				   
+ 0003  0032 R 003E R 0060 R			choice   dw chongqi, xitong, cl
+				ock, change   
+       010A R			
+						    
+ 000B						kaishi:   
+ 000B  E8 038F R						call jiemian   
+ 000E  B4 00							mov ah,0   
+ 0010  CD 16							int 16h  
+								 
+ 0012  80 FC 02							cmp ah,02   
+ 0015  72 F4							jb kaishi   
+								 
+ 0017  80 FC 05							cmp ah,05   
+ 001A  77 EF							ja kaishi   
+								 
+ 001C  8A C4							mov al,ah   
+ 001E  B4 00							mov ah,0   
+ 0020  2C 02							sub al,2   
+ 0022  02 C0							add al,al   
+ 0024  8B D8							mov bx,ax   
+ 0026  2E: FF 97 0003 R						call word ptr c
+				hoice[bx]   
+ 002B  EB DE							jmp kaishi   
+								 
+								;;;;;;;;;;;;;;;
+				; 
+ 002D  B8 4C00							mov ax,4c00h   
+ 0030  CD 21							int 21h   
+				   
+				 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-3
+
+
+				   
+				 
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;重启计算机  
+				   
+ 0032				chongqi:  
+ 0032  E8 0405 R						call clear     
+				  
+ 0035  B8 FFFF							mov ax,0ffffh  
+				 
+ 0038  50							push ax   
+ 0039  B8 0000							mov ax,0   
+ 003C  50							push ax   
+ 003D  CB							retf   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;;;;;;;引导操作系统  
+				   
+				   
+ 003E				xitong:   
+ 003E  E8 0405 R						call clear     
+				  
+ 0041  B8 0000							mov ax,0   
+ 0044  8E C0							mov es,ax   
+ 0046  BB 7C00							mov bx,7c00h   
+								   
+ 0049  B0 01							mov al,1   
+ 004B  B5 00							mov ch,0   
+ 004D  B1 01							mov cl,1   
+ 004F  B6 00							mov dh,0   
+ 0051  B2 80							mov dl,80h   
+				   
+ 0053  B4 02							mov ah,2   
+ 0055  CD 13							int 13h   
+							    
+ 0057  B8 0000							mov ax,0   
+ 005A  50							push ax   
+ 005B  B8 7C00							mov ax,7c00h   
+ 005E  50							push ax   
+ 005F  CB							retf   
+					 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				显示时钟 
+					 
+ 0060				clock:   
+ 0060  EB 19 90							jmp  zhunbei   
+				    
+				   
+ 0063  20 20 2F 20 20 2F 20					geshi: db '  / 
+				 /     :  :  ',0   
+       20 20 20 20 3A 20 20	
+       3A 20 20 00		
+ 0075  09 08 07 04 02 00					time:  db 9,8,7
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-4
+
+
+				,4,2,0   
+				   
+ 007B				    zhunbei:     
+ 007B  1E							push ds   
+ 007C  55							push bp   
+ 007D  53							push bx   
+ 007E  51							push cx   
+ 007F  50							push ax   
+ 0080  06							push es   
+ 0081  57							push di   
+ 0082  52							push dx   
+				   
+ 0083  E8 0405 R						call clear   
+ 0086  B2 02							mov dl,2   
+				   
+ 0088				    showtime:     
+ 0088  0E							push cs   
+ 0089  1F							pop ds   
+								 
+								 
+								 
+								 
+								;;;;;;;;;;;;;;;
+				;;;;;先把实时的时间搬运到geshi 
+ 008A  BD 0063 R						mov bp,offset g
+				eshi   
+ 008D  BB 0075 R						mov bx,offset t
+				ime  
+				 
+								 
+ 0090  B9 0006							mov cx,6   
+ 0093						 sht1:   
+						  
+ 0093  51							push cx   
+ 0094  8A 07							mov al,[bx]   
+ 0096  E6 70							out 70h,al   
+ 0098  E4 71							in al,71h   
+ 009A  8A E0							mov ah,al   
+ 009C  B1 04							mov cl,4   
+ 009E  D2 EC							shr ah,cl   
+ 00A0  24 0F							and al,00001111
+				b   
+ 00A2  80 C4 30							add ah,30h   
+ 00A5  04 30							add al,30h   
+ 00A7  3E: 88 66 00						mov ds:[bp],ah 
+				  
+ 00AB  3E: 88 46 01						mov ds:[bp+1],a
+				l   
+ 00AF  43							inc bx   
+ 00B0  83 C5 03							add bp,3   
+								 
+								 
+ 00B3  59							pop cx   
+								 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-5
+
+
+								 
+ 00B4  E2 DD							loop sht1   
+							;;;;;;;;;;;;;;;;;;;;;;;
+				;;; 
+							 
+							 
+				 
+							 
+							 
+							 
+ 00B6  B8 B800							mov ax,0b800h  
+				 
+ 00B9  8E C0							mov es,ax   
+ 00BB  BF 0690							mov di,10*160+4
+				0*2   
+ 00BE  BB 0063 R						mov bx,offset g
+				eshi   
+ 00C1					   sht2:    
+ 00C1  8A 0F							mov cl,[bx]   
+ 00C3  B5 00							mov ch,0   
+ 00C5  E3 0D							jcxz bijiao   
+ 00C7  26: 88 0D						mov es:[di],cl 
+				  
+ 00CA  26: 88 55 01						mov es:[di+1],d
+				l   
+ 00CE  43							inc bx   
+ 00CF  83 C7 02							add di,2   
+ 00D2  EB ED							jmp sht2   
+				   
+ 00D4					    bijiao:    
+ 00D4  B4 01							mov ah,1   ;;;;
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+ 00D6  CD 16							int 16h    
+								 
+ 00D8  3C 1B							cmp al,1bh   
+ 00DA  74 1E							je fanhui  
+					;esc返回 
+ 00DC  80 FC 3B							cmp ah,3bh   
+ 00DF  74 11							je bianse  ;f1�
+				��色 
+								 
+								 
+ 00E1  EB 03 90							jmp qita 
+								 
+ 00E4  EB A2							jmp showtime  
+								 
+								 
+								 
+								 
+								;;;;;;;;;;; 
+								 
+ 00E6						qita: 
+ 00E6  B4 01							mov ah,1   
+ 00E8  CD 16							int 16h   
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-6
+
+
+ 00EA  74 9C							jz showtime   
+ 00EC  B4 00							mov ah,0  
+ 00EE  CD 16							int 16h  
+								 
+ 00F0  EB F4							jmp qita 
+				 
+								 
+								 
+								 
+								 
+								 
+ 00F2					    bianse:    
+					    
+ 00F2  B4 00							mov ah,0   
+ 00F4  CD 16							int 16h    
+								 
+ 00F6  FE C2							inc dl   
+ 00F8  EB 8E							jmp showtime 
+				 
+								 
+ 00FA					    fanhui:    
+					    
+ 00FA  B4 00							mov ah,0   
+ 00FC  CD 16							int 16h    
+								 
+ 00FE  E8 0405 R						call clear   
+ 0101  5A							pop dx   
+ 0102  5F							pop di   
+ 0103  07							pop es   
+ 0104  58							pop ax   
+ 0105  59							pop cx   
+ 0106  5B							pop bx   
+ 0107  5D							pop bp   
+ 0108  1F							pop ds   
+ 0109  C3							ret   
+				   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;改
+				变时间 
+				   
+				   
+				   
+ 010A				change:  
+								 
+ 010A  EB 5B 90							jmp shezhi   
+				   
+				  
+ 010D  69 6E 70 75 74 20 66		 datainput  db "input form:yy/mm/dd hh:
+				mm:ss,press enter to end   /  /     :  :  ",0 
+       6F 72 6D 3A 79 79 2F	
+       6D 6D 2F 64 64 20 68	
+       68 3A 6D 6D 3A 73 73	
+       2C 70 72 65 73 73 20	
+       65 6E 74 65 72 20 74	
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-7
+
+
+       6F 20 65 6E 64 20 20	
+       20 2F 20 20 2F 20 20	
+       20 20 20 3A 20 20 3A	
+       20 20 00			
+ 014F  20 20 2F 20 20 2F 20		 geshi2:    db '  /  /     :  :  ',0  
+       20 20 20 20 3A 20 20	
+       3A 20 20 00		
+ 0161  09 08 07 04 02 00		 time2:  	db 9,8,7,4,2,0   
+					   
+					   
+					   
+ 0167					    shezhi:   
+ 0167  50							push ax   
+ 0168  53							push bx   
+ 0169  51							push cx   
+ 016A  52							push dx   
+ 016B  55							push bp   
+ 016C  56							push si   
+ 016D  57							push di   
+ 016E  1E							push ds   
+ 016F  06							push es   
+								 
+								 
+ 0170  E8 0405 R						call clear   
+								 
+								 
+								 
+ 0173  0E							push cs   
+ 0174  1F							pop ds   
+								 
+ 0175  B8 B800							mov ax,0b800h  
+				 
+ 0178  8E C0							mov es,ax   
+								;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;; 
+				 
+ 017A  BE 010D R						mov si,offset d
+				atainput 
+				 
+ 017D  BA 0100							mov dx,0100h 
+				 
+ 0180  E8 0210 R						call showtishi 
+								 
+								 
+								;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;;;; 
+ 0183  BF 0100							mov di,1*160+48
+				*2   
+				 
+				  
+ 0186  BB 0000							mov bx,0  
+ 0189  BE 014F R						mov si,offset g
+				eshi2   
+ 018C  B6 01							mov dh,1   
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-8
+
+
+ 018E  B2 30							mov dl,48 
+ 0190  E8 01D5 R						call getstr   
+								 
+							;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;; 
+				 
+				 
+							 
+ 0193  BB 014F R						mov bx,offset g
+				eshi2    
+ 0196  BD 0161 R						mov bp,offset t
+				ime2   
+								 
+								 
+ 0199  B9 0006							mov cx,6   
+ 019C						biantime:   
+									
+						;;;;;十进制-》BCD码 
+ 019C  51							push cx   
+								 
+ 019D  B5 00							mov ch,0   
+ 019F  B1 04							mov cl,4   
+ 01A1  8A 27							mov ah,[bx]  ;h
+				igh 
+ 01A3  8A 47 01							mov al,[bx+1]  
+				;low 
+ 01A6  80 EC 30							sub ah,30h   
+ 01A9  2C 30							sub al,30h   
+ 01AB  D2 E4							shl ah,cl   
+ 01AD  02 E0							add ah,al   
+								 
+								 
+ 01AF  3E: 8A 46 00						mov al,ds:[bp] 
+				  
+ 01B3  E6 70							out 70h,al  
+				 
+				  
+ 01B5  8A C4							mov al,ah   
+ 01B7  E6 71							out 71h,al   
+								 
+ 01B9  59							pop cx   
+								 
+ 01BA  83 C3 03							add bx,3   
+ 01BD  45							inc bp   
+ 01BE  E2 DC							loop biantime  
+				  
+								 
+							;;;;;;;;;;;;;;;;;;;;;;;
+				;;;; 
+				 
+								 
+							 
+							;;;;;;;;;;;;;;;;;;;;;;;
+				;;; 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-9
+
+
+								 
+				 
+								 
+								 
+ 01C0					 read00:  			
+					;;;;;不esc 就继续读 
+ 01C0  B4 00							mov ah,0   
+ 01C2  CD 16							int 16h  
+								 
+ 01C4  3C 1B							cmp al,1bh   
+ 01C6  75 F8							jne read00   
+ 01C8  E8 0405 R						call clear   
+ 01CB  07							pop es   
+ 01CC  1F							pop ds   
+ 01CD  5F							pop di   
+ 01CE  5E							pop si   
+ 01CF  5D							pop bp   
+ 01D0  5A							pop dx   
+ 01D1  59							pop cx   
+ 01D2  5B							pop bx   
+ 01D3  58							pop ax   
+ 01D4  C3							ret   
+								 
+								 
+								 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;字符串 
+				   
+ 01D5					getstr:    
+ 01D5  50							push ax   
+				;;;;;;;;; 
+				   
+ 01D6					getstrs:   
+ 01D6  B4 00							mov ah,0   
+ 01D8  CD 16							int 16h   
+								;;;;;;;;;;;;; 
+				 
+								;;;;;;;;;;;;;;;
+				; 
+								 
+ 01DA  3C 20							cmp al,20h   
+ 01DC  72 0C							jb nochar   
+								 
+				 
+								 
+								 
+								 
+ 01DE  B4 00							mov ah,0   
+ 01E0  E8 0242 R						call charstack 
+				  
+ 01E3  B4 02							mov ah,2   
+ 01E5  E8 0242 R						call charstack 
+				  
+								 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-10
+
+
+								 
+ 01E8  EB EC							jmp getstrs   
+				   
+ 01EA					nochar:     
+							     
+ 01EA  80 FC 0E							cmp ah,0eh   
+ 01ED  74 07							je backspace   
+ 01EF  80 FC 1C							cmp ah,1ch   
+ 01F2  74 0E							je enterr  
+ 01F4  EB E0							jmp getstrs   
+ 01F6					backspace:  
+				 
+ 01F6  B4 01							mov ah,1   
+ 01F8  E8 0242 R						call charstack 
+				  
+ 01FB  B4 02							mov ah,2   
+ 01FD  E8 0242 R						call charstack 
+				  
+ 0200  EB D4							jmp getstrs   
+ 0202					enterr:     
+								 
+ 0202  B0 00							mov al,0   
+ 0204  B4 00							mov ah,0   
+ 0206  E8 0242 R						call charstack 
+				  
+								 
+ 0209  B4 02							mov ah,2   
+ 020B  E8 0242 R						call charstack 
+				  
+								 
+								 
+				 
+ 020E  58							pop ax   
+ 020F  C3							ret   
+				   
+				   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;; 
+ 0210				showtishi: 
+				 
+ 0210  50			    push ax              
+				 
+ 0211  06			    push es 
+				 
+ 0212  52			    push dx 
+				 
+ 0213  57			    push di 
+				 
+ 0214  56			    push si 
+				 
+ 0215  B8 B800			    mov ax,0b800h       
+				 
+ 0218  8E C0			    mov es,ax           
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-11
+
+
+				 
+ 021A  B0 A0			    mov al,0a0h          
+				 
+ 021C  F6 E6			    mul dh               
+				 
+ 021E  8B F8			    mov di,ax            
+ 0220  B0 02			    mov al,2             
+ 0222  F6 E2			    mul dl               
+				 
+ 0224  03 F8			    add di,ax           ; 
+				 
+ 0226				    s: 
+				 
+ 0226  8B 04			    mov ax,ds:[si]      ; 
+				 
+ 0228  26: 89 05		    mov es:[di],ax 
+				 
+ 022B  47			    inc di               
+				 
+ 022C  26: 88 0D		    mov es:[di],cl      
+				 
+ 022F  46			    inc si              
+				 
+ 0230  51			    push cx             
+				 
+ 0231  8B 0C			    mov cx,ds:[si]       
+				 
+ 0233  B5 00			    mov ch,0             
+				 
+				                        
+				 
+ 0235  E3 04			    jcxz endshow        
+				 
+ 0237  59			    pop cx               
+				 
+ 0238  47			    inc di              
+				 
+ 0239  EB EB			    jmp s                
+				 
+ 023B				    endshow: 
+				 
+ 023B  59			    pop cx              
+				 
+				                       
+				 
+ 023C  5E			    pop si             
+				 
+ 023D  5F			    pop di 
+				 
+ 023E  5A			    pop dx 
+				 
+ 023F  07			    pop es 
+				 
+ 0240  58			    pop ax 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-12
+
+
+				 
+ 0241  C3			    ret 
+				 
+				   
+				   
+				   
+				   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;; 
+ 0242  EB 08				charstack: jmp short charstart   
+				   
+				   
+						 
+ 0244  0260 R 026F R 0286 R			table  dw charpush,charpop,char
+				show   
+ 024A  0000					top    dw 0   
+				   
+ 024C  53				charstart: push bx   
+ 024D  52						   push dx   
+ 024E  57						   push di   
+ 024F  06						   push es   
+							    
+							 
+ 0250  80 FC 02						   cmp ah,2   
+ 0253  77 6A						   ja xun   
+ 0255  8A DC						   mov bl,ah   
+ 0257  B7 00						   mov bh,0   
+ 0259  03 DB						   add bx,bx   
+ 025B  2E: FF A7 0244 R					   jmp word ptr table[b
+				x]  
+				 
+				 
+ 0260					 charpush:  
+							   ;;;;;; 
+				 
+							   ;;;;;;; 
+ 0260  2E: 8B 1E 024A R					   mov bx,top   
+ 0265  88 00						   mov [si][bx],al   
+ 0267  2E: FF 06 024A R					   inc top   
+							    
+ 026C  EB 51 90						   jmp xun   
+				   
+ 026F  2E: 83 3E 024A R 00		 charpop:  cmp top,0   
+ 0275  74 48						   je xun   
+ 0277  2E: FF 0E 024A R					   dec top   
+ 027C  2E: 8B 1E 024A R					   mov bx,top   
+ 0281  8A 00						   mov al,[si][bx]   
+ 0283  E9 038A R					   jmp sret    
+				   
+ 0286  BB B800				 charshow: mov bx,0b800h   
+ 0289  8E C3						   mov es,bx   
+ 028B  B0 A0						   mov al,160   
+ 028D  B4 00						   mov ah,0   
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-13
+
+
+ 028F  F6 E6						   mul dh   
+ 0291  8B F8						   mov di,ax   
+ 0293  02 D2						   add dl,dl   
+ 0295  B6 00						   mov dh,0   
+ 0297  03 FA						   add di,dx   
+				   
+ 0299  BB 0000						   mov bx,0   
+				   
+ 029C  2E: 3B 1E 024A R			charshows: cmp bx,top   
+ 02A1  75 07						   jne noempty   
+ 02A3  26: C6 05 20					   mov byte ptr es:[di]
+				,' '   
+ 02A7  E9 038A R					   jmp sret   
+ 02AA  8A 00				  noempty: mov al,[si][bx]   
+ 02AC  26: 88 05					   mov es:[di],al   
+ 02AF  26: C6 45 01 02					   mov byte ptr es:[di+
+				1],2   
+ 02B4  26: C6 45 02 20					   mov byte ptr es:[di+
+				2],' '   
+ 02B9  43						   inc bx   
+ 02BA  83 C7 02						   add di,2   
+ 02BD  EB DD						   jmp charshows   
+							    
+							    
+ 02BF						xun:	    
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+				 
+				 
+				 
+				 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;hour 
+				 
+ 02BF  2E: 83 3E 024A R 0A					cmp top,10 
+ 02C5  74 33							je xiao2 
+								 
+							 
+							 
+ 02C7  2E: 83 3E 024A R 0B					cmp top,11 
+ 02CD  74 38							je xiao4 
+								 
+								 
+								 
+								 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+						minute		 
+								 
+ 02CF  2E: 83 3E 024A R 0D					cmp top,13 
+ 02D5  74 3D							je xiao5 
+								 
+							 
+							 
+ 02D7  2E: 83 3E 024A R 0E					cmp top,14 
+ 02DD  74 42							je xiao9 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-14
+
+
+				;;;;;;;;;;	second		 
+ 02DF  2E: 83 3E 024A R 10					cmp top,16 
+ 02E5  74 47							je xiao52 
+								 
+							 
+							 
+ 02E7  2E: 83 3E 024A R 11					cmp top,17 
+ 02ED  74 4C							je xiao92 
+						 
+							 
+							 
+						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+ 02EF						jixu:	  
+						 
+						 
+ 02EF  2E: 83 3E 024A R 12				   cmp top,18 
+ 02F5  75 51						   jne zhongji   
+							   ;;;;;;;;;;;;;;;;; 
+							    
+ 02F7  E9 0383 R					   jmp wei0 
+							    
+							  ;;;;;;;;;;;;;;;  
+							    
+				 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;;;; 
+ 02FA						xiao2: 
+ 02FA  80 38 32							cmp byte ptr [s
+				i][bx],32h 
+ 02FD  77 4C							ja wei9 
+ 02FF  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 0302  72 47							jb wei9 
+								 
+ 0304  E9 038A R						jmp sret 
+								 
+ 0307						xiao4: 
+ 0307  80 38 34							cmp byte ptr [s
+				i][bx],34h 
+ 030A  77 48							ja wei10 
+ 030C  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 030F  72 43							jb wei10 
+								 
+ 0311  EB 77 90							jmp sret  
+							    
+					 
+					 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;;	 
+ 0314						xiao5: 
+ 0314  80 38 35							cmp byte ptr [s
+				i][bx],35h 
+ 0317  77 44							ja wei12 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-15
+
+
+ 0319  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 031C  72 3F							jb wei12 
+								 
+ 031E  EB 6A 90							jmp sret 
+								 
+ 0321						xiao9: 
+ 0321  80 38 39							cmp byte ptr [s
+				i][bx],39h 
+ 0324  77 40							ja wei13 
+ 0326  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 0329  72 3B							jb wei13 
+								 
+ 032B  EB 5D 90							jmp sret  
+							    
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;;;;;;;; 
+ 032E						xiao52: 
+ 032E  80 38 35							cmp byte ptr [s
+				i][bx],35h 
+ 0331  77 3C							ja wei15 
+ 0333  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 0336  72 37							jb wei15 
+								 
+ 0338  EB 50 90							jmp sret 
+								 
+ 033B						xiao92: 
+ 033B  80 38 39							cmp byte ptr [s
+				i][bx],39h 
+ 033E  77 39							ja wei16 
+ 0340  80 38 30							cmp byte ptr [s
+				i][bx],30h 
+ 0343  72 34							jb wei16 
+								 
+ 0345  EB 43 90							jmp sret  
+				 
+								 
+								 
+								 
+ 0348  EB 40 90			zhongji:  jmp sret 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+					 
+ 034B						wei9: 
+ 034B  2E: C7 06 024A R 0009					mov top,9 
+ 0352  EB 9B							jmp jixu  
+ 0354						wei10: 
+ 0354  2E: C7 06 024A R 000A					mov top,10 
+ 035B  EB 92							jmp jixu  
+				 
+				 
+						 
+						 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-16
+
+
+ 035D						wei12: 
+ 035D  2E: C7 06 024A R 000C					mov top,12 
+ 0364  EB 89							jmp jixu  
+ 0366						wei13: 
+ 0366  2E: C7 06 024A R 000D					mov top,13 
+ 036D  EB 80							jmp jixu   
+							    
+						 
+				 
+ 036F						wei15: 
+ 036F  2E: C7 06 024A R 000F					mov top,15 
+ 0376  E9 02EF R						jmp jixu  
+ 0379						wei16: 
+ 0379  2E: C7 06 024A R 0010					mov top,16 
+ 0380  E9 02EF R						jmp jixu   
+						 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+						 
+							    
+							    
+					 
+							    
+							    
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;			    
+ 0383						wei0:	    
+						 
+ 0383  2E: C7 06 024A R 0000				   mov top,0 
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+				 
+							    
+ 038A						sret:   
+							;;;;;;;;;;;;;; 
+								 
+				 
+							    
+							;;;;;;;;;;;;;; 
+						 
+						 
+							   
+ 038A  07						   pop es   
+ 038B  5F						   pop di   
+ 038C  5A						   pop dx   
+ 038D  5B						   pop bx   
+ 038E  C3						   ret   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;;;;;; 
+								 
+				   
+ 038F						 jiemian:   
+						  
+						  
+ 038F  EB 32							jmp short show 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-17
+
+
+				  
+ 0391  31 29 20 72 65 73 65					db '1) reset pc
+				',0   
+       74 20 70 63 00		
+ 039D  32 29 20 73 74 61 72					db '2) start sy
+				stem',0   
+       74 20 73 79 73 74 65	
+       6D 00			
+ 03AD  33 29 20 63 6C 6F 63					db '3) clock',0
+				   
+       6B 00			
+ 03B6  34 29 20 73 65 74 20					db '4) set cloc
+				k',0   
+       63 6C 6F 63 6B 00	
+									
+									
+								 
+ 03C3  1E					 show:  push ds   
+ 03C4  56							push si   
+ 03C5  50							push ax   
+ 03C6  06							push es   
+ 03C7  53							push bx   
+ 03C8  51							push cx   
+ 03C9  57							push di   
+				   
+ 03CA  0E							push cs   
+ 03CB  1F							pop ds   
+ 03CC  BE 038F R						mov si,offset j
+				iemian   
+ 03CF  83 C6 02							add si,2   
+ 03D2  B8 B800							mov ax,0b800h  
+				 
+ 03D5  8E C0							mov es,ax   
+ 03D7  BB 07B2							mov bx,12*160+2
+				5*2   
+				   
+				  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+				   
+ 03DA  B9 0004							mov cx,4   
+ 03DD						  show1:    
+ 03DD  51							push cx   
+ 03DE  BF 0000							mov di,0  
+								 
+								 
+ 03E1						  show2:    
+						   
+ 03E1  8A 0C							mov cl,[si]   
+ 03E3  B5 00							mov ch,0   
+ 03E5  E3 0E							jcxz show3 
+					;是否到达字符串尾部 
+								 
+ 03E7  26: 88 09						mov es:[bx+di],
+				cl   
+ 03EA  26: C6 41 01 02						mov byte ptr es
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-18
+
+
+				:[bx+di+1],2   
+ 03EF  46							inc si   
+ 03F0  83 C7 02							add di,2   
+ 03F3  EB EC							jmp show2   
+								 
+ 03F5						  show3:    
+ 03F5  59							pop cx   
+ 03F6  46							inc si   
+ 03F7  81 C3 00A0						add bx,160   
+								 
+								 
+								 
+ 03FB  E2 E0							loop show1   
+				   
+ 03FD  5F							pop di   
+ 03FE  59							pop cx   
+ 03FF  5B							pop bx   
+ 0400  07							pop es   
+ 0401  58							pop ax   
+ 0402  5E							pop si   
+ 0403  1F							pop ds   
+								 
+								 
+ 0404  C3							ret            
+				                    
+				 
+				 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;;;;;				 
+ 0405				clear:  
+ 0405  50							push ax   
+ 0406  06							push es   
+ 0407  51							push cx   
+ 0408  56							push si   
+								   
+ 0409  B8 B800							mov ax,0b800h  
+				 
+ 040C  8E C0							mov es,ax   
+ 040E  B9 07D0							mov cx,2000   
+ 0411  BE 0000							mov si,0   
+ 0414						kong:    
+ 0414  26: C6 04 20						mov byte ptr es
+				:[si],' '  
+ 0418  26: C6 44 01 07						mov byte ptr es
+				:[si+1],07 
+ 041D  83 C6 02							add si,2   
+ 0420  E2 F2							loop kong    
+				 
+								   
+ 0422  5E							pop si   
+ 0423  59							pop cx   
+ 0424  07							pop es   
+ 0425  58							pop ax   
+								 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Page     1-19
+
+
+								 
+ 0426  C3							ret   
+				   
+				   
+						  
+				 
+ 0427				code ends  
+				   
+				end lizhiyu 
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0427	PARA	NONE	
+DURU . . . . . . . . . . . . . .  	0017	PARA	NONE	
+XIERU  . . . . . . . . . . . . .  	002D	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BACKSPACE  . . . . . . . . . . .  	L NEAR	01F6	CODE
+BIANSE . . . . . . . . . . . . .  	L NEAR	00F2	CODE
+BIANTIME . . . . . . . . . . . .  	L NEAR	019C	CODE
+BIJIAO . . . . . . . . . . . . .  	L NEAR	00D4	CODE
+
+CHANGE . . . . . . . . . . . . .  	L NEAR	010A	CODE
+CHARPOP  . . . . . . . . . . . .  	L NEAR	026F	CODE
+CHARPUSH . . . . . . . . . . . .  	L NEAR	0260	CODE
+CHARSHOW . . . . . . . . . . . .  	L NEAR	0286	CODE
+CHARSHOWS  . . . . . . . . . . .  	L NEAR	029C	CODE
+CHARSTACK  . . . . . . . . . . .  	L NEAR	0242	CODE
+CHARSTART  . . . . . . . . . . .  	L NEAR	024C	CODE
+CHOICE . . . . . . . . . . . . .  	L WORD	0003	CODE
+CHONGQI  . . . . . . . . . . . .  	L NEAR	0032	CODE
+CLEAR  . . . . . . . . . . . . .  	L NEAR	0405	CODE
+CLOCK  . . . . . . . . . . . . .  	L NEAR	0060	CODE
+
+DATAINPUT  . . . . . . . . . . .  	L BYTE	010D	CODE
+
+ENDSHOW  . . . . . . . . . . . .  	L NEAR	023B	CODE
+ENTERR . . . . . . . . . . . . .  	L NEAR	0202	CODE
+
+FANHUI . . . . . . . . . . . . .  	L NEAR	00FA	CODE
+
+GESHI  . . . . . . . . . . . . .  	L NEAR	0063	CODE
+GESHI2 . . . . . . . . . . . . .  	L NEAR	014F	CODE
+GETSTR . . . . . . . . . . . . .  	L NEAR	01D5	CODE
+GETSTRS  . . . . . . . . . . . .  	L NEAR	01D6	CODE
+
+JIEMIAN  . . . . . . . . . . . .  	L NEAR	038F	CODE
+JIXU . . . . . . . . . . . . . .  	L NEAR	02EF	CODE
+
+KAISHI . . . . . . . . . . . . .  	L NEAR	000B	CODE
+KONG . . . . . . . . . . . . . .  	L NEAR	0414	CODE
+
+LIZHIYU  . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+NOCHAR . . . . . . . . . . . . .  	L NEAR	01EA	CODE
+NOEMPTY  . . . . . . . . . . . .  	L NEAR	02AA	CODE
+
+QITA . . . . . . . . . . . . . .  	L NEAR	00E6	CODE
+
+Microsoft (R) Macro Assembler Version 5.00                  4/21/17 19:12:59
+                                                             Symbols-2
+
+
+READ00 . . . . . . . . . . . . .  	L NEAR	01C0	CODE
+
+S  . . . . . . . . . . . . . . .  	L NEAR	0226	CODE
+SHEZHI . . . . . . . . . . . . .  	L NEAR	0167	CODE
+SHOW . . . . . . . . . . . . . .  	L NEAR	03C3	CODE
+SHOW1  . . . . . . . . . . . . .  	L NEAR	03DD	CODE
+SHOW2  . . . . . . . . . . . . .  	L NEAR	03E1	CODE
+SHOW3  . . . . . . . . . . . . .  	L NEAR	03F5	CODE
+SHOWTIME . . . . . . . . . . . .  	L NEAR	0088	CODE
+SHOWTISHI  . . . . . . . . . . .  	L NEAR	0210	CODE
+SHT1 . . . . . . . . . . . . . .  	L NEAR	0093	CODE
+SHT2 . . . . . . . . . . . . . .  	L NEAR	00C1	CODE
+SRET . . . . . . . . . . . . . .  	L NEAR	038A	CODE
+START  . . . . . . . . . . . . .  	L NEAR	0000	XIERU
+
+TABLE  . . . . . . . . . . . . .  	L WORD	0244	CODE
+TIME . . . . . . . . . . . . . .  	L NEAR	0075	CODE
+TIME2  . . . . . . . . . . . . .  	L NEAR	0161	CODE
+TOP  . . . . . . . . . . . . . .  	L WORD	024A	CODE
+
+WEI0 . . . . . . . . . . . . . .  	L NEAR	0383	CODE
+WEI10  . . . . . . . . . . . . .  	L NEAR	0354	CODE
+WEI12  . . . . . . . . . . . . .  	L NEAR	035D	CODE
+WEI13  . . . . . . . . . . . . .  	L NEAR	0366	CODE
+WEI15  . . . . . . . . . . . . .  	L NEAR	036F	CODE
+WEI16  . . . . . . . . . . . . .  	L NEAR	0379	CODE
+WEI9 . . . . . . . . . . . . . .  	L NEAR	034B	CODE
+
+XIAO2  . . . . . . . . . . . . .  	L NEAR	02FA	CODE
+XIAO4  . . . . . . . . . . . . .  	L NEAR	0307	CODE
+XIAO5  . . . . . . . . . . . . .  	L NEAR	0314	CODE
+XIAO52 . . . . . . . . . . . . .  	L NEAR	032E	CODE
+XIAO9  . . . . . . . . . . . . .  	L NEAR	0321	CODE
+XIAO92 . . . . . . . . . . . . .  	L NEAR	033B	CODE
+XITONG . . . . . . . . . . . . .  	L NEAR	003E	CODE
+XUN  . . . . . . . . . . . . . .  	L NEAR	02BF	CODE
+
+ZHONGJI  . . . . . . . . . . . .  	L NEAR	0348	CODE
+ZHUNBEI  . . . . . . . . . . . .  	L NEAR	007B	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  zong52		
+
+
+    857 Source  Lines
+    857 Total   Lines
+     70 Symbols
+
+  50930 + 449230 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,186 @@
+Microsoft (R) Macro Assembler Version 5.00                  4/11/17 21:42:15
+                                                             Page     1-1
+
+
+				assume cs:code  
+				 
+ 0000				data segment 
+ 0000  68 65 6C 6C 6F 20 77	db 'hello world!' 
+       6F 72 6C 64 21		
+				 
+				 
+ 000C				data ends 
+				 
+				 
+ 0000				code segment 
+				 
+ 0000				start: 
+				 
+				 
+ 0000  8C C8				mov ax,cs 
+ 0002  8E D8				mov ds,ax  
+ 0004  BE 0200 R			mov si,offset fun0 
+ 0007  B8 0000				mov ax,0 
+ 000A  8E C0				mov es,ax  
+ 000C  BF 0200				mov di,200h 
+ 000F  B9 FF9B				mov cx,offset fun0-offset fun0end   
+ 0012  FC				cld 
+ 0013  F3/ A4				rep movsb 
+					 
+					 
+ 0015  B8 0000				mov ax,0 
+ 0018  8E C0				mov es,ax  
+ 001A  26: C7 06 01F0 0200		mov word ptr es:[7ch*4],200h 
+ 0021  26: C7 06 01F2 0000		mov word ptr es:[7ch*4+2],0 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+					 
+					 
+ 0028  BB 0000				mov bx,0  
+ 002B  B8 ---- R			mov ax,data  
+ 002E  8E C0				mov es,ax  
+					 
+ 0030  BA 0000				mov dx,0  
+ 0033  B4 01				mov ah,1 
+ 0035  CD 7C				int 7ch  
+					 
+					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+ 0037  B8 4C00				mov ax,4c00h 
+ 003A  CD 21				int 21h  
+					 
+					 
+					 
+ 0200					org 200h  
+					 
+ 0200				fun0: 
+ 0200  EB 04				jmp short set 
+ 0202  0219 R 023F R			table dw read,write 
+				 
+					 
+Microsoft (R) Macro Assembler Version 5.00                  4/11/17 21:42:15
+                                                             Page     1-2
+
+
+					 
+					 
+ 0206				set: 
+ 0206  53				push bx  
+ 0207  80 FC 01				cmp ah,1  
+ 020A  77 0B				ja jieshu 
+ 020C  8A DC				mov bl,ah  
+ 020E  B7 00				mov bh,0 
+ 0210  03 DB				add bx,bx 	 
+ 0212  2E: FF 97 0202 R			call word ptr table[bx] 
+					 
+					 
+ 0217				jieshu: 
+ 0217  5B				pop bx  
+ 0218  CF				iret  
+					 
+					 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	 
+ 0219				read: 
+ 0219  51				push cx  
+ 021A  8B C2				mov ax,dx  
+ 021C  BA 0000				mov dx,0  
+ 021F  B9 05A0				mov cx,1440 
+ 0222  F7 F1				div cx  
+ 0224  8B DA				mov bx,dx ;余数给bx,继续除法 
+ 0226  8A F0				mov dh,al  
+ 0228  B1 12				mov cl,18  
+ 022A  8B C3				mov ax,bx ;余数继续除法 
+ 022C  F6 F1				div cl  
+ 022E  8A E8				mov ch,al  
+ 0230  80 C4 01				add ah,1  
+ 0233  8A CC				mov cl,ah  
+ 0235  B2 00				mov dl,0  
+ 0237  B0 01				mov al,1  
+ 0239  B4 02				mov ah,2  
+ 023B  CD 13				int 13h  
+					 
+ 023D  59				pop cx  
+					 
+ 023E  C3				ret  
+					 
+					 
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+ 023F				write: 
+ 023F  51				push cx  
+					 
+ 0240  8B C2				mov ax,dx  
+ 0242  BA 0000				mov dx,0  
+ 0245  B9 05A0				mov cx,1440  
+ 0248  F7 F1				div cx  
+ 024A  8B DA				mov bx,dx  
+ 024C  8A F0				mov dh,al  
+ 024E  B1 12				mov cl,18  
+ 0250  8B C3				mov ax,bx  
+Microsoft (R) Macro Assembler Version 5.00                  4/11/17 21:42:15
+                                                             Page     1-3
+
+
+ 0252  F6 F1				div cl  
+ 0254  8A E8				mov ch,al;磁道号 
+ 0256  80 C4 01				add ah,1  
+					 
+ 0259  8A CC				mov cl,ah ;扇区号 
+ 025B  B2 00				mov dl,0  
+ 025D  B0 01				mov al,1  
+ 025F  B4 03				mov ah,3 
+ 0261  CD 13				int 13h  
+					 
+ 0263  59				pop cx  
+					 
+ 0264  C3				ret  
+					 
+					 
+ 0265				fun0end: 
+ 0265  90				nop 
+					 
+					 
+				 
+				 
+				 
+				 
+				 
+ 0266				code ends  
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  4/11/17 21:42:15
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0266	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	000C	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+FUN0 . . . . . . . . . . . . . .  	L NEAR	0200	CODE
+FUN0END  . . . . . . . . . . . .  	L NEAR	0265	CODE
+
+JIESHU . . . . . . . . . . . . .  	L NEAR	0217	CODE
+
+READ . . . . . . . . . . . . . .  	L NEAR	0219	CODE
+
+SET  . . . . . . . . . . . . . .  	L NEAR	0206	CODE
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+TABLE  . . . . . . . . . . . . .  	L WORD	0202	CODE
+
+WRITE  . . . . . . . . . . . . .  	L NEAR	023F	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  171		
+
+
+    133 Source  Lines
+    133 Total   Lines
+     12 Symbols
+
+  50962 + 465582 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
